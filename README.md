@@ -9,19 +9,21 @@ Credential Verifier built as an EigenLayer Actively Validated Service
 #### Setup and Run
 
 - `yarn install`
-- `cd contracts`
-    - `forge install`
-    - `forge build`
+- `forge install`
+    - `cd lib/eigenlayer-middleware/lib/eigenlayer-contracts` and `forge install` as well
+- `forge build`
 - Start Anvil in seperate terminal: `anvil`
-- In a separate terminal window, deploy the EigenLayer contracts. To do so, change directory to `contracts/lib/eigenlayer-middleware/lib/eigenlayer-contracts` and run the following commands:
+- In a separate terminal window, deploy the EigenLayer contracts. To do so, change directory to `lib/eigenlayer-middleware/lib/eigenlayer-contracts` and run the following commands:
 
 ```sh
 forge script script/deploy/devnet/M2_Deploy_From_Scratch.s.sol --rpc-url http://localhost:8545 \
 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast \
 --sig "run(string memory configFile)" -- M2_deploy_from_scratch.anvil.config.json
 ```
-- copy `contracts/lib/eigenlayer-middleware/lib/eigenlayer-contracts/script/output/devnet/eigenlayer_deployment_output.json` to `contracts/script/output/31337/eigenlayer_deployment_output.json`
-- In a separate terminal window, deploy the AVS contracts. Change directory to `contracts` and run:
+```sh
+cp lib/eigenlayer-middleware/lib/eigenlayer-contracts/script/output/devnet/M2_from_scratch_deployment_data.json script/output/31337/eigenlayer_deployment_output.json
+```
+- Deploy the AVS contracts. Run from project root directory:
 
 ```sh
 forge script script/CredentialVerifierDeployer.s.sol --rpc-url http://localhost:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast -v
@@ -31,3 +33,4 @@ forge script script/CredentialVerifierDeployer.s.sol --rpc-url http://localhost:
 
 #### Notes and Troubleshooting
 - Update `credentialVerifierABI.ts` if updating contract function signatures or adding functions
+- If you want to leave anvil and deployments in place while updating the operator logic, comment out `registerOperator` call in `main` in `operator/index.ts`

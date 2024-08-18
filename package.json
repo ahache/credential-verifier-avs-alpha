@@ -2,7 +2,7 @@
   "name": "credential-verifier-avs",
   "version": "1.0.0",
   "type": "module",
-  "author": "Alex Hache <ahache8@gmail.com>",
+  "author": "Alex Hache",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.5.4"
