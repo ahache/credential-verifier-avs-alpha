@@ -1,66 +1,33 @@
-## Foundry
+## Verifiable Credential Verifier AVS
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Credential Verifier built as an EigenLayer Actively Validated Service
 
-Foundry consists of:
+#### Requirements
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- Foundry
 
-## Documentation
+#### Setup and Run
 
-https://book.getfoundry.sh/
+- `yarn install`
+- `cd contracts`
+    - `forge install`
+    - `forge build`
+- Start Anvil in seperate terminal: `anvil`
+- In a separate terminal window, deploy the EigenLayer contracts. To do so, change directory to `contracts/lib/eigenlayer-middleware/lib/eigenlayer-contracts` and run the following commands:
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```sh
+forge script script/deploy/devnet/M2_Deploy_From_Scratch.s.sol --rpc-url http://localhost:8545 \
+--private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast \
+--sig "run(string memory configFile)" -- M2_deploy_from_scratch.anvil.config.json
 ```
+- copy `contracts/lib/eigenlayer-middleware/lib/eigenlayer-contracts/script/output/devnet/eigenlayer_deployment_output.json` to `contracts/script/output/31337/eigenlayer_deployment_output.json`
+- In a separate terminal window, deploy the AVS contracts. Change directory to `contracts` and run:
 
-### Test
-
-```shell
-$ forge test
+```sh
+forge script script/CredentialVerifierDeployer.s.sol --rpc-url http://localhost:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast -v
 ```
+- Run the operator: `npx tsx operator/index.ts`
+- Create a task: `npx tsx operator/createTask.ts`
 
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+#### Notes and Troubleshooting
+- Update `credentialVerifierABI.ts` if updating contract function signatures or adding functions
