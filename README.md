@@ -1,10 +1,10 @@
 ## Verifiable Credential Verifier AVS
 
-Credential Verifier built as an EigenLayer Actively Validated Service
+Credential Verifier proof of concept built as an EigenLayer Actively Validated Service
 
 #### Requirements
 
-- Foundry
+- [Foundry](https://book.getfoundry.sh/getting-started/installation)
 
 #### Setup and Run
 
