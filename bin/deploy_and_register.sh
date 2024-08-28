@@ -30,9 +30,9 @@ cp "$PROJECT_ROOT/lib/eigenlayer-middleware/lib/eigenlayer-contracts/script/outp
 echo "Deploying AVS contracts..."
 forge script "$PROJECT_ROOT/script/CredentialVerifierDeployer.s.sol" --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast -v
 
-# Run the operator
-echo "Running the operator..."
+# Register the operator
+echo "Register operator..."
 cd "$PROJECT_ROOT"
-npx tsx operator/index.ts
+npx tsx operator/registerOperator.ts
 
-echo "Deployment and run completed successfully."
+echo "Deployment and registration completed successfully."

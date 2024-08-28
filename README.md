@@ -19,19 +19,14 @@ Credential Verifier proof of concept built as an EigenLayer Actively Validated S
     anvil
     ```
 
-3. **Deploy and Run:**
-    In another terminal window, run:
+3. **Deploy Contracts and Register Operator:**
     ```sh
-    ./bin/deploy_and_run.sh
+    ./bin/deploy_and_register.sh
     ```
 
-4. **Updating the TypeScript ABI:**
-    
-    If updating `CredentialVerifierServiceManager.sol`, update the TypeScript ABI after running `forge build`. 
-    
-    **Make sure `jq` is installed locally:**
+4. **Run Operator:**
     ```sh
-    ./bin/update_service_manager_abi.sh
+    npx tsx operator/index.ts
     ```
 
 5. **Create a Task:**
@@ -40,6 +35,11 @@ Credential Verifier proof of concept built as an EigenLayer Actively Validated S
     npx tsx operator/createTask.ts
     ```
 
-### Notes and Troubleshooting
+### Updating the TypeScript ABI
 
-- If you want to leave Anvil and deployments in place while updating the operator logic, comment out the `registerOperator` call in `main` in `operator/index.ts`.
+If updating `CredentialVerifierServiceManager.sol`, update the TypeScript ABI after running `forge build`. 
+
+**Make sure `jq` is installed locally, then run:**
+```sh
+./bin/update_service_manager_abi.sh
+```
