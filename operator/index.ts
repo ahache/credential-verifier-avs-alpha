@@ -33,7 +33,8 @@ const verifyCredentialAndSign = async (taskId: number, credential: string, crede
         const signature = await wallet.signMessage(credentialHashBytes);
         
         const tx = await credentialVerifierContract.respondToTask(taskId, credentialHash, signature);
-        await tx.wait();
+        const receipt = await tx.wait();
+        console.log("Transaction receipt:", receipt);
     } else {
         console.log("Credential not verified");
         // throw new Error("Credential not verified");
@@ -85,7 +86,7 @@ const registerOperator = async () => {
 
 const monitorNewTasks = async () => {
     credentialVerifierContract.on("TaskCreated", async (latestTaskNum: number, credential: string, credentialHash: string) => {
-        console.log(`New task detected: Credential is ${credential}`);
+        console.log(`New task detected`);
         await verifyCredentialAndSign(latestTaskNum, credential, credentialHash);
     });
 
