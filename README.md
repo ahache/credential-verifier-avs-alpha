@@ -1,6 +1,14 @@
 ## Verifiable Credential Verifier AVS
 
-Credential Verifier proof of concept built as an EigenLayer Actively Validated Service
+This is a proof of concept for a Credential Verifier built as an EigenLayer Actively Validated Service (AVS). 
+
+Key features and goals:
+- Clients (subjects, issuers, etc.) can verify JWT credentials, establishing their verification on chain and enhancing the issuers' reputation.
+- AVS operators verify credentials off-chain and pass necessary data to the AVS contract, where the credential signature is checked against the issuer's public key (converted to an Ethereum address equivalent).
+- Further data about the issuer, subject and credential can be written on chain.
+- A public track record of issuer claims can be established.
+
+## Development
 
 ### Requirements
 

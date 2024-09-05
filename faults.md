@@ -1,8 +1,16 @@
-### Operator faults
+## Operator Faults
 
-- Operators are expected to sign the hash of a successfully verified credential. This signature is then written on chain as an attestation. 
+### Objectively Attributable Fault Detection
 
-- Although it may be possible in some cases, the credential verification process would generally not be objectively verifiable on chain. This would prevent objectively attributable fault detection. Using ZK might be possible if the scope of credential/signature type is limited, which could be the case in similar AVSs that perform a very specific role.
+The credential verification process uses objectively attributable fault detection:
 
-- Otherwise this AVS would need to rely on intersubjectively attributable fault detection. Operators would need to be monitored by entities that can submit a proof of rouge behavior.
+1. Operators verify credentials off-chain.
+2. Relevant data is passed to the contract.
+3. The contract verifies the credential signature against the issuer's public key (Ethereum address equivalent).
+4. Signature components must be provided when creating a task and issuer signing keys must be generated from the secp256k1 curve.
 
+### Intersubjectively Attributable Fault Detection
+
+- Additional information can be written on-chain.
+- Operators may perform other off-chain tasks.
+- Some of these tasks may require intersubjective fault detection (further details to be specified).

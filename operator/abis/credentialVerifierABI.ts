@@ -86,12 +86,6 @@ export const credentialVerifierABI =
         "internalType": "string",
         "name": "credential",
         "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "credentialHash",
-        "type": "bytes32"
       }
     ],
     "name": "TaskCreated",
@@ -120,7 +114,7 @@ export const credentialVerifierABI =
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "taskId",
         "type": "uint256"
       }
     ],
@@ -128,32 +122,8 @@ export const credentialVerifierABI =
     "outputs": [
       {
         "internalType": "bytes32",
-        "name": "",
+        "name": "taskHash",
         "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "allTaskResponses",
-    "outputs": [
-      {
-        "internalType": "bytes",
-        "name": "",
-        "type": "bytes"
       }
     ],
     "stateMutability": "view",
@@ -230,6 +200,16 @@ export const credentialVerifierABI =
         "internalType": "string",
         "name": "credential",
         "type": "string"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
       }
     ],
     "name": "createTask",
@@ -359,13 +339,28 @@ export const credentialVerifierABI =
       },
       {
         "internalType": "bytes32",
-        "name": "credentialHash",
+        "name": "messageHash",
         "type": "bytes32"
       },
       {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "credentialIssuerEthAddress",
+        "type": "address"
       }
     ],
     "name": "respondToTask",
@@ -406,6 +401,30 @@ export const credentialVerifierABI =
       {
         "internalType": "address",
         "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "taskId",
+        "type": "uint256"
+      }
+    ],
+    "name": "taskResponses",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "credentialIssuer",
         "type": "address"
       }
     ],

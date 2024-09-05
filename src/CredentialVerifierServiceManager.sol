@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.18;
 
-import "@eigenlayer/contracts/libraries/BytesLib.sol";
+// import "@eigenlayer/contracts/libraries/BytesLib.sol";
 import "@eigenlayer/contracts/core/DelegationManager.sol";
 import "@eigenlayer-middleware/src/unaudited/ECDSAServiceManagerBase.sol";
 import "@eigenlayer-middleware/src/unaudited/ECDSAStakeRegistry.sol";
@@ -14,25 +14,17 @@ contract CredentialVerifierServiceManager is
     ICredentialVerifierServiceManager,
     ECDSAServiceManagerBase
 {
-    using BytesLib for bytes;
-    using ECDSAUpgradeable for bytes32;
+    // Keep this around in case deciding to use OZ recover function
+    // using ECDSAUpgradeable for bytes32;
 
-    /* STORAGE */
-    // The latest task index
     uint32 public latestTaskNum;
 
-    // mapping of task indices to all tasks hashes
-    // when a task is created, task hash is stored here,
-    // and responses need to pass the actual task,
-    // which is hashed onchain and checked against this mapping
-    // CV: this would contain the hash of the credential
-    mapping(uint256 => bytes32) public allTaskHashes;
+    mapping(uint256 taskId => bytes32 taskHash) public allTaskHashes;
 
-    // mapping of task indices to hash of abi.encode(taskResponse, taskResponseMetadata)
-    // CV: this would contain the signed hash of the credential
-    mapping(address => mapping(uint256 => bytes)) public allTaskResponses;
+    // Operators end up storing the credentialIssuer address for each taskId
+    // Will keep this for now but will update to improved reputation system later
+    mapping(address operator => mapping(uint256 taskId => address credentialIssuer)) public taskResponses;
 
-    /* MODIFIERS */
     modifier onlyOperator() {
         require(
             ECDSAStakeRegistry(address(stakeRegistry)).operatorRegistered(msg.sender) 
@@ -56,31 +48,49 @@ contract CredentialVerifierServiceManager is
         )
     {}
 
-    function createTask(string memory credential) external {
-        // Create a new task hash directly from the credential
-        bytes32 credentialHash = keccak256(abi.encode(credential));
-
-        // Store the hash of the task on-chain
-        allTaskHashes[latestTaskNum] = credentialHash;
-
-        // Emit an event for the new task creation
-        // The credential has to be emit here in string format for verifier
-        emit TaskCreated(latestTaskNum, credential, credentialHash);
-
-        // Increment the latest task number
-        latestTaskNum = latestTaskNum + 1;
+    // Helper function to create a hash from signature components
+    function signatureHash(bytes32 r, bytes32 s) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(r, s));
     }
 
-    function respondToTask(uint256 taskId, bytes32 credentialHash, bytes calldata signature) external onlyOperator {
-        require(allTaskHashes[taskId] == credentialHash, "Credential hash does not match task");
-        require(allTaskResponses[msg.sender][taskId].length == 0, "Task already responded to");
-        
-        bytes32 ethSignedCredentialHash = credentialHash.toEthSignedMessageHash();
-        address signer = ethSignedCredentialHash.recover(signature);
-        require(signer == msg.sender, "Invalid signature, not operator");
+    function createTask(string memory credential, bytes32 r, bytes32 s) external {
+        // Create a new task hash using the signature components
+        bytes32 taskHash = signatureHash(r, s);
 
-        allTaskResponses[msg.sender][taskId] = signature;
+        // Store the hash of the task on-chain
+        allTaskHashes[latestTaskNum] = taskHash;
 
+        // Emit an event for the new task creation
+        emit TaskCreated(latestTaskNum, credential);
+
+        // Increment the latest task number
+        latestTaskNum++;
+    }
+
+    function respondToTask(
+        uint256 taskId,
+        bytes32 messageHash,
+        bytes32 r,
+        bytes32 s,
+        uint8 v,
+        address credentialIssuerEthAddress
+    ) external onlyOperator {
+        // Hash the r and s values
+        bytes32 taskHash = signatureHash(r, s);
+
+        // Check if the task hash matches the stored hash for the given taskId
+        require(allTaskHashes[taskId] == taskHash, "Task hash does not match");
+
+        // Recover the signer's address using ecrecover
+        address recoveredSigner = ecrecover(messageHash, v, r, s);
+
+        // Check if the recovered signer matches the provided credentialIssuerEthAddress
+        require(recoveredSigner == credentialIssuerEthAddress, "Invalid signature");
+
+        // Store the signerAddress directly as an address
+        taskResponses[msg.sender][taskId] = credentialIssuerEthAddress;
+
+        // Emit the TaskResponded event
         emit TaskResponded(taskId, msg.sender);
     }
 

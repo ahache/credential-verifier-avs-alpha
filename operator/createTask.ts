@@ -48,17 +48,33 @@ const ethrCredential = {
 };
 
 const createTask = async () => {
-    const credential = webCredential;
-    try {
-        console.log("Creating task...");
-        const credentialString = JSON.stringify(credential);
-        const tx = await contract.createTask(credentialString);
-        const receipt = await tx.wait();
-        console.log("Task created successfully");
-        console.log("Transaction receipt:", receipt);
-    } catch (error) {
-        console.error("Error creating task:", error);
-    }
+  const credential = ethrCredential;
+  try {
+      console.log("Creating task...");
+      const credentialString = JSON.stringify(credential);
+      
+      // Check if JWT is present in the credential proof
+      if (!credential.proof || !credential.proof.jwt) {
+        throw new Error("JWT is missing from the credential proof");
+      }
+      const jwt = credential.proof.jwt;
+      const [, , signatureB64] = jwt.split('.');
+      
+      // Decode the base64 signature
+      const signatureBuffer = Buffer.from(signatureB64, 'base64');
+      
+      // Extract r and s values
+      const r = '0x' + signatureBuffer.subarray(0, 32).toString('hex');
+      const s = '0x' + signatureBuffer.subarray(32, 64).toString('hex');
+      
+      // Call the contract function with credentialString, r, and s
+      const tx = await contract.createTask(credentialString, r, s);
+      const receipt = await tx.wait();
+      console.log("Task created successfully");
+      // console.log("Transaction receipt:", receipt);
+  } catch (error) {
+      console.error("Error creating task:", error);
+  }
 };
 
 createTask().catch((error) => {
